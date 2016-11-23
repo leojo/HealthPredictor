@@ -23,9 +23,9 @@ histograms = np.array(extractHistograms("../data/set_train",4500,45,9))
 print "Training model"
 model = pipeline.make_pipeline(
 		StandardScaler(),
-		SelectKBest(k=1400),
-		PCA(n_components=100),
-		AdaBoostClassifier(base_estimator=SVC(kernel='poly',probability=True))
+		SelectKBest(k=20000),
+		PCA(n_components=1000),
+		RandomForestClassifier(max_depth=20,n_estimators=600,max_features=200)
 		)
 model.fit(histograms,targets)
 
@@ -34,7 +34,7 @@ testData = np.array(extractHistograms('../data/set_test',4500,45,9))
 predictions = model.predict_proba(testData)
 predictions_0, predictions_1 = zip(*predictions)
 print predictions_1
-with open('adaboost.csv', 'w') as csvfile:
+with open('randomforest.csv', 'w') as csvfile:
 	resultWriter = csv.writer(csvfile, delimiter=',', quotechar='|')
 	resultWriter.writerow(['ID','Prediction'])
 	for i in range(0,len(predictions_1)):
