@@ -2,10 +2,12 @@ import csv
 import numpy as np
 from random import shuffle
 from sklearn import pipeline
+from sklearn.neighbors import KNeighborsClassifier
 from sklearn.feature_selection import *
 from sklearn.gaussian_process import *
 from sklearn.neural_network import *
 from sklearn.preprocessing import *
+from sklearn.decomposition import *
 from sklearn.linear_model import *
 from sklearn.ensemble import *
 from sklearn.svm import *
@@ -21,28 +23,36 @@ with open('../data/targets.csv', 'rb') as f:
     reader = csv.reader(f)
     targets = list(reader)
 
-targets = [int(x[0]) for x in targets]
+targets = np.asarray([int(x[0]) for x in targets])
 
-data = extractHistograms("../data/set_train",4500,45,9)
+data = np.asarray(extractHistograms("../data/set_train",4500,45,9))
 print "Shape of data:"
 print np.array(data).shape
 
 print "Estimating error:"
 
 models = {
-	"AdaBoost 1500-best (mutual_info_classif)" : pipeline.make_pipeline(
-		SelectKBest(score_func=mutual_info_classif,k=1500),
+	"AdaBoost (select1400best)" : pipeline.make_pipeline(
+		SelectKBest(k=1400),
 		AdaBoostClassifier()
 	),
-	"AdaBoost 1500-best" : pipeline.make_pipeline(
-		SelectKBest(k=1500),
+	"AdaBoost (PCA 1400 - whiten)" : pipeline.make_pipeline(
+		PCA(n_components=1400,whiten=True),
 		AdaBoostClassifier()
+	),
+	"AdaBoost (PCA 1400)" : pipeline.make_pipeline(
+		PCA(n_components=1400),
+		AdaBoostClassifier()
+	),
+	"Nearest neighbours (PCA 10)": pipeline.make_pipeline(
+		PCA(n_components=10),
+    	KNeighborsClassifier(3)
 	)
 }
 
-for key, model in models.items():
-	scores = cross_val_score(model, data, targets, cv=5, scoring='neg_mean_absolute_error', n_jobs=-1)
-	print "Average error: %0.2f (+/- %0.2f) [%s]" % (-scores.mean(), scores.std(),key)
+for key, model in sorted(models.items()):
+	scores = cross_val_score(model, data, targets, cv=5, scoring='f1', n_jobs=-1)
+	print "score: %0.2f (+/- %0.2f) [%s]" % (scores.mean(), scores.std(),key)
 
 
 #hist_targ = zip(data,targets)
