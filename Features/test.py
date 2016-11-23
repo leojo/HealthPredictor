@@ -1,3 +1,5 @@
 from extract_features import *
 
-extractHistograms("../set_train",4500,45,9)
+extractBrainPart("../data/set_train",n_divisions=3,x_part=1,y_part=1,z_part=1)
+extractBrainPart("../data/set_test",n_divisions=3,x_part=1,y_part=1,z_part=1)
+

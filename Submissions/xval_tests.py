@@ -14,8 +14,6 @@ from sklearn.svm import *
 from sklearn.model_selection import cross_val_score
 from sklearn.externals import joblib
 
-from VotingRegressor import VotingRegressor
-from LooRegressor import LooRegressor
 from Features.extract_features import *
 
 # Get the targets
@@ -25,50 +23,26 @@ with open('../data/targets.csv', 'rb') as f:
 
 targets = np.asarray([int(x[0]) for x in targets])
 
-data = np.asarray(extractHistograms("../data/set_train",4500,45,9))
+data = np.asarray(extractHierarchicalClusters("../data/set_train",50,scale=0.1))
 print "Shape of data:"
 print np.array(data).shape
 
 print "Estimating error:"
 
 models = {
-	"AdaBoost (select1400best)" : pipeline.make_pipeline(
-		SelectKBest(k=1400),
-		AdaBoostClassifier()
-	),
-	"AdaBoost (PCA 1400 - whiten)" : pipeline.make_pipeline(
-		PCA(n_components=1400,whiten=True),
-		AdaBoostClassifier()
-	),
-	"AdaBoost (PCA 1400)" : pipeline.make_pipeline(
-		PCA(n_components=1400),
-		AdaBoostClassifier()
-	),
-	"AdaBoost (scaler - select 1400 - PCA 100)" : pipeline.make_pipeline(
+	"SVC" : pipeline.make_pipeline(
 		StandardScaler(),
-		SelectKBest(k=1400),
-		PCA(n_components=100),
-		AdaBoostClassifier()
+		SelectKBest(k=40),
+		SVC(kernel='poly', probability=True)
 	),
-	"Nearest neighbours-3 (PCA 10)": pipeline.make_pipeline(
-		PCA(n_components=10),
-    	KNeighborsClassifier(3)
-	),
-	"Nearest neighbours-2 (PCA 10)": pipeline.make_pipeline(
-		PCA(n_components=10),
-    	KNeighborsClassifier(3)
-	),
-	"Nearest neighbours-1 (PCA 10)": pipeline.make_pipeline(
-		PCA(n_components=10),
-    	KNeighborsClassifier(3)
-	),
-	"Nearest neighbours-4 (PCA 10)": pipeline.make_pipeline(
-		PCA(n_components=10),
-    	KNeighborsClassifier(3)
+	"RandomForestClassifier" : pipeline.make_pipeline(
+		StandardScaler(),
+		RandomForestClassifier(max_depth=20,n_estimators=600,max_features=3)
 	)
 }
 
 for key, model in sorted(models.items()):
+	print(key)
 	scores = cross_val_score(model, data, targets, cv=10, scoring='neg_log_loss', n_jobs=-1)
 	print "score: %0.2f (+/- %0.2f) [%s]" % (-scores.mean(), scores.std(),key)
 
