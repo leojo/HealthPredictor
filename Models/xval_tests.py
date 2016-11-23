@@ -44,15 +44,33 @@ models = {
 		PCA(n_components=1400),
 		AdaBoostClassifier()
 	),
-	"Nearest neighbours (PCA 10)": pipeline.make_pipeline(
+	"AdaBoost (scaler - select 1400 - PCA 100)" : pipeline.make_pipeline(
+		StandardScaler(),
+		SelectKBest(k=1400),
+		PCA(n_components=100),
+		AdaBoostClassifier()
+	),
+	"Nearest neighbours-3 (PCA 10)": pipeline.make_pipeline(
+		PCA(n_components=10),
+    	KNeighborsClassifier(3)
+	),
+	"Nearest neighbours-2 (PCA 10)": pipeline.make_pipeline(
+		PCA(n_components=10),
+    	KNeighborsClassifier(3)
+	),
+	"Nearest neighbours-1 (PCA 10)": pipeline.make_pipeline(
+		PCA(n_components=10),
+    	KNeighborsClassifier(3)
+	),
+	"Nearest neighbours-4 (PCA 10)": pipeline.make_pipeline(
 		PCA(n_components=10),
     	KNeighborsClassifier(3)
 	)
 }
 
 for key, model in sorted(models.items()):
-	scores = cross_val_score(model, data, targets, cv=5, scoring='f1', n_jobs=-1)
-	print "score: %0.2f (+/- %0.2f) [%s]" % (scores.mean(), scores.std(),key)
+	scores = cross_val_score(model, data, targets, cv=10, scoring='neg_log_loss', n_jobs=-1)
+	print "score: %0.2f (+/- %0.2f) [%s]" % (-scores.mean(), scores.std(),key)
 
 
 #hist_targ = zip(data,targets)
