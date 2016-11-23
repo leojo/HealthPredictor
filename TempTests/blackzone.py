@@ -42,12 +42,18 @@ for i in range(0,len(allImageSrc)):
 	img = nib.load(allImageSrc[i])
 	imgData = img.get_data();
 	# brain seen from top, center
-	brain_slice = imgData[52:120, 65:150, 55:110, 0]
+	'''brain_slice = imgData[52:120, 65:150, 55:110, 0]
 	black_pixels = 0
 	for j in range(0,len(brain_slice)):
 		for k in range(0, len(brain_slice[j])):
 			for l in range(0, len(brain_slice[j][k])):
-				if(brain_slice[j][k][l] < 450): black_pixels = black_pixels+1
+				if(brain_slice[j][k][l] < 450): black_pixels = black_pixels+1'''
+
+	brain_slice = imgData[52:120, 65:150, 88, 0]
+	black_pixels = 0
+	for j in range(0,len(brain_slice)):
+		for k in range(0, len(brain_slice[j])):
+			if(brain_slice[j][k] < 450): black_pixels = black_pixels+1
 	
 	print "Percentage done: "+str((i*100)/len(allImageSrc))+" %"
 	# Our 'feature' is how many black pixels we have:
