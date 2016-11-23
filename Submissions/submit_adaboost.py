@@ -30,7 +30,7 @@ print "Testing model"
 testData = np.array(extractHistograms('../data/set_test',4500,45,9))
 predictions = model.predict(testData).flatten().tolist()
 print predictions
-with open('svc.csv', 'w') as csvfile:
+with open('ababoost.csv', 'w') as csvfile:
 	resultWriter = csv.writer(csvfile, delimiter=',', quotechar='|')
 	resultWriter.writerow(['ID','Prediction'])
 	for i in range(0,len(predictions)):
