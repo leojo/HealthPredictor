@@ -84,3 +84,4 @@ for key, model in sorted(models.items()):
 	scores = cross_val_score(model, data, targets, cv=10, scoring='neg_log_loss', n_jobs=-1)
 	print "score: %0.2f (+/- %0.2f) [%s]" % (-scores.mean(), scores.std(),key)
 
+

@@ -48,25 +48,70 @@ linearly_separable = (X, y)
             linearly_separable
             ]'''
 
-histoData = np.asarray(extractHistograms("../data/set_train", 4500, 45, 16))
-zoneData = np.asarray(extractZoneAverages("../data/set_train", 8))
-categoryData = np.asarray(extractHistograms("../data/set_train",nBins = 8))
-pcaHisto = PCA(n_components=2)
-pcaHistoData = pcaHisto.fit_transform(histoData)
-pcaZone = PCA(n_components=2)
-pcaZoneData = pcaZone.fit_transform(zoneData)
-pcaCategory = PCA(n_components=2)
-pcaCategoryData = pcaCategory.fit_transform(categoryData)
 # Get the targets
 with open('../data/targets.csv', 'rb') as f:
     reader = csv.reader(f)
     targets = list(reader)
 targets = np.asarray([int(x[0]) for x in targets])           
+
+
+#histograms
+histoData = np.asarray(extractHistograms("../data/set_train", 4500, 45, 16))
+pcaHisto = PCA(n_components=2)
+pcaHistoData = pcaHisto.fit_transform(histoData)
 myDatasetHisto = (pcaHistoData, targets)
+
+
+# zones
+zoneData = np.asarray(extractZoneAverages("../data/set_train", 8))
+pcaZone = PCA(n_components=2)
+pcaZoneData = pcaZone.fit_transform(zoneData)
 myDatasetZone = (pcaZoneData, targets)
 myDatasetCategory = (pcaCategoryData, targets)
 
-datasets = [myDatasetHisto, myDatasetZone, myDatasetCategory]
+# zones 
+'''
+blackData = np.asarray(extractBlackzones("../data/set_train", 8))
+pcaBlack = PCA(n_components=2)
+pcaBlackData = pcaBlack.fit_transform(blackData)
+myDatasetBlack = (pcaBlackData, targets)
+
+blackData2 = np.asarray(extractBlackzones("../data/set_train", 8))
+blackData2 = blackData2*blackData2
+pcaBlack2 = PCA(n_components=2)
+pcaBlackData2 = pcaBlack2.fit_transform(blackData2)
+myDatasetBlack2 = (pcaBlackData2, targets)
+
+blackData3 = np.asarray(extractBlackzones("../data/set_train", 8))
+print blackData3
+blackData3 = np.log10((blackData3+np.asarray([[1]*len(blackData3[0])]*len(blackData3))))
+print blackData3
+pcaBlack3 = PCA(n_components=2)
+pcaBlackData3 = pcaBlack3.fit_transform(blackData3)
+myDatasetBlack3 = (pcaBlackData3, targets)'''
+
+# zones
+blackData = np.asarray(extractColoredZone("../data/set_train", 1, 450, 8))
+pcaBlack = PCA(n_components=2)
+pcaBlackData = pcaBlack.fit_transform(blackData)
+myDatasetBlack = (pcaBlackData, targets)
+
+grayData = np.asarray(extractColoredZone("../data/set_train", 450, 800, 8))
+pcaGray = PCA(n_components=2)
+pcaGrayData = pcaGray.fit_transform(grayData)
+myDatasetGray = (pcaGrayData, targets)
+
+whiteData = np.asarray(extractColoredZone("../data/set_train", 800, 1500, 8))
+pcaWhite = PCA(n_components=2)
+pcaWhiteData = pcaWhite.fit_transform(whiteData)
+myDatasetWhite = (pcaWhiteData, targets)
+
+evenWhiterData = np.asarray(extractColoredZone("../data/set_train", 1500, 4000, 8))
+pcaEvenWhiter = PCA(n_components=2)
+pcaWhiterData = pcaEvenWhiter.fit_transform(evenWhiterData)
+myDatasetWhiter = (pcaWhiterData, targets)
+
+datasets = [myDatasetBlack, myDatasetGray, myDatasetWhite, myDatasetWhiter]
 
 figure = plt.figure(figsize=(27, 9))
 i = 1
