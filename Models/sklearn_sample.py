@@ -17,11 +17,12 @@ from Features.extract_features import *
 import csv
 from sklearn.decomposition import PCA
 from sklearn.model_selection import cross_val_score
+from sklearn.feature_selection import SelectKBest
 
 h = .02  # step size in the mesh
 
 names = ["Nearest Neighbors", "Linear SVM", "RBF SVM", "Gaussian Process",
-         "Decision Tree", "Random Forest", "Neural Net", "AdaBoost",
+         "Poly SVM", "Random Forest", "Neural Net", "AdaBoost",
          "Naive Bayes", "QDA"]
 
 classifiers = [
@@ -29,7 +30,7 @@ classifiers = [
     SVC(kernel="linear", C=0.025, probability=True),
     SVC(gamma=2, C=1, probability=True),
     GaussianProcessClassifier(1.0 * RBF(1.0), warm_start=True),
-    DecisionTreeClassifier(max_depth=5),
+    SVC(kernel="poly", C=1.0, probability=True), 
     RandomForestClassifier(max_depth=5, n_estimators=10, max_features=1),
     MLPClassifier(alpha=1),
     AdaBoostClassifier(),
@@ -56,7 +57,7 @@ targets = np.asarray([int(x[0]) for x in targets])
 
 
 #histograms
-histoData = np.asarray(extractHistograms("../data/set_train", 4500, 45, 16))
+histoData = np.asarray(extractHistograms("../data/set_train", 1500, 45, 16))
 pcaHisto = PCA(n_components=2)
 pcaHistoData = pcaHisto.fit_transform(histoData)
 myDatasetHisto = (pcaHistoData, targets)
@@ -90,6 +91,7 @@ pcaBlackData3 = pcaBlack3.fit_transform(blackData3)
 myDatasetBlack3 = (pcaBlackData3, targets)'''
 
 # zones
+'''
 blackData = np.asarray(extractColoredZone("../data/set_train", 1, 450, 8))
 pcaBlack = PCA(n_components=2)
 pcaBlackData = pcaBlack.fit_transform(blackData)
@@ -100,6 +102,12 @@ pcaGray = PCA(n_components=2)
 pcaGrayData = pcaGray.fit_transform(grayData)
 myDatasetGray = (pcaGrayData, targets)
 
+grayData2 = np.asarray(extractColoredZone("../data/set_train", 450, 800, 8))
+grayData2 = np.log10((grayData2+np.asarray([[1]*len(grayData2[0])]*len(grayData2))))
+pcaGray2 = PCA(n_components=2)
+pcaGrayData2 = pcaGray2.fit_transform(grayData2)
+myDatasetGray2 = (pcaGrayData2, targets)
+
 whiteData = np.asarray(extractColoredZone("../data/set_train", 800, 1500, 8))
 pcaWhite = PCA(n_components=2)
 pcaWhiteData = pcaWhite.fit_transform(whiteData)
@@ -109,12 +117,39 @@ evenWhiterData = np.asarray(extractColoredZone("../data/set_train", 1500, 4000, 
 pcaEvenWhiter = PCA(n_components=2)
 pcaWhiterData = pcaEvenWhiter.fit_transform(evenWhiterData)
 myDatasetWhiter = (pcaWhiterData, targets)
+'''
+
+blackData = np.asarray(extractColoredZone("../data/set_train", 200, 750, 16))
+#bestSelectorBlack = SelectKBest(k=20)
+pcaBlack = PCA(n_components=2)
+#pcaBlackData = bestSelectorBlack.fit_transform(blackData, targets)
+pcaBlackData = pcaBlack.fit_transform(pcaBlack)
+myDatasetBlack = (pcaBlackData, targets)
+'''
+grayData = np.asarray(extractColoredZone("../data/set_train", 400, 800, 8))
+bestSelectorGray = SelectKBest(k=100)
+pcaGray = PCA(n_components=2)
+pcaGrayData = bestSelectorGray.fit_transform(grayData, targets)
+pcaGrayData = pcaGray.fit_transform(pcaGrayData)
+myDatasetGray = (pcaGrayData, targets)
+
+whiteData = np.asarray(extractColoredZone("../data/set_train", 350, 900, 8))
+bestSelectorWhite = SelectKBest(k=100)
+pcaWhite = PCA(n_components=2)
+pcaWhiteData = bestSelectorWhite.fit_transform(whiteData, targets)
+pcaWhiteData = pcaWhite.fit_transform(pcaWhiteData)
+myDatasetWhite = (pcaWhiteData, targets)
+
+evenWhiterData = np.asarray(extractColoredZone("../data/set_train", 200, 750, 8))
+bestSelectorWhiter = SelectKBest(k=100)
+pcaEvenWhiter = PCA(n_components=2)
+pcaWhiterData = bestSelectorWhiter.fit_transform(evenWhiterData, targets)
+pcaWhiterData = pcaEvenWhiter.fit_transform(pcaWhiterData)
+myDatasetWhiter = (pcaWhiterData, targets)
+'''
 
 
-
-
-
-datasets = [myDatasetBlack, myDatasetGray, myDatasetWhite, myDatasetWhiter]
+datasets = [myDatasetHisto, myDatasetZone, myDatasetBlack]
 
 figure = plt.figure(figsize=(27, 9))
 i = 1
