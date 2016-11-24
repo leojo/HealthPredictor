@@ -48,7 +48,7 @@ for key, model in sorted(models.items()):
 	print(key)
 	pl = pipeline.make_pipeline(
 		StandardScaler(),
-		SelectKBest(mutual_info_classif,k=20000),
+		SelectKBest(k=20000),
 		PCA(n_components=1400),
 		model)
 	scores = cross_val_score(pl, data, targets, cv=10, scoring='neg_log_loss', n_jobs=-1)
