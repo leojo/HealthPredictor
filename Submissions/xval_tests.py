@@ -13,6 +13,7 @@ from sklearn.ensemble import *
 from sklearn.svm import *
 from sklearn.naive_bayes import GaussianNB
 from sklearn.gaussian_process.kernels import RBF
+from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
 from sklearn.model_selection import cross_val_score
 from sklearn.externals import joblib
 
@@ -25,19 +26,32 @@ with open('../data/targets.csv', 'rb') as f:
 
 targets = np.asarray([int(x[0]) for x in targets])
 
-data = np.asarray(extractHistograms("../data/set_train",4500,45,9))
+#data = np.asarray(extractHistograms("../data/set_train",1500,4,9))
+data = np.asarray(extractColoredZone("../data/set_train", 450, 800, 8))
 print "Shape of data:"
 print np.array(data).shape
 
 print "Estimating error:"
 
 models = {
-	"SVC (poly)" : SVC(kernel='poly', probability=True),
-	"RandomForestClassifier" : RandomForestClassifier(max_depth=20,n_estimators=700,max_features=200),
-	"SVC (rbf)" : SVC(kernel='rbf', gamma=2, probability=True),
-	"Gaussian" : GaussianProcessClassifier(1.0 * RBF(1.0), warm_start=True),
-	"Neural net" : MLPClassifier(hidden_layer_sizes=(700,),activation='logistic'),
-	"AdaBoost" : AdaBoostClassifier(base_estimator=SVC(kernel='poly',probability=True), n_estimators=700)
+	#"SVC (poly)" : SVC(kernel='poly', probability=True),
+	#"RandomForestClassifier" : RandomForestClassifier(max_depth=20,n_estimators=700,max_features=200),
+	#"SVC (rbf)" : SVC(kernel='rbf', gamma=2, probability=True),
+	#"Gaussian" : GaussianProcessClassifier(1.0 * RBF(1.0), warm_start=True),
+	#"Neural net" : MLPClassifier(hidden_layer_sizes=(700,),activation='logistic'),
+	#"AdaBoost" : AdaBoostClassifier(base_estimator=SVC(kernel='poly',probability=True), n_estimators=700)
+
+	#"Nearest Neighbors":KNeighborsClassifier(3),
+    "Linear SVM":SVC(kernel="linear", C=0.025, probability=True),
+    #"Poly SVM":SVC(kernel="poly", C=0.025, probability=True),
+    #"RBF SVM":SVC(gamma=2, C=1, probability=True),
+    "Gaussian Process":GaussianProcessClassifier(1.0 * RBF(1.0), warm_start=True),
+    #"Decision Tree":DecisionTreeClassifier(max_depth=5),
+    #"Random Forest":RandomForestClassifier(max_depth=5, n_estimators=10, max_features=1),
+    "Neural Net":MLPClassifier(alpha=1),
+    #"AdaBoost":AdaBoostClassifier(),
+    "Naive Bayes":GaussianNB(),
+    "QDA":QuadraticDiscriminantAnalysis()
 }
 
 voting_model = {"Voting Classifier": VotingClassifier(models.items(), voting='soft',n_jobs=-1)}
@@ -47,9 +61,8 @@ models.update(voting_model)
 for key, model in sorted(models.items()):
 	print(key)
 	pl = pipeline.make_pipeline(
+		PCA(n_components=2),
 		StandardScaler(),
-		SelectKBest(k=20000),
-		PCA(n_components=1400),
 		model)
 	scores = cross_val_score(pl, data, targets, cv=10, scoring='neg_log_loss', n_jobs=-1)
 	print "score: %0.2f (+/- %0.2f) [%s]" % (-scores.mean(), scores.std(),key)
