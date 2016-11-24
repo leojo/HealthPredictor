@@ -11,6 +11,8 @@ from sklearn.decomposition import *
 from sklearn.linear_model import *
 from sklearn.ensemble import *
 from sklearn.svm import *
+from sklearn.naive_bayes import GaussianNB
+from sklearn.gaussian_process.kernels import RBF
 from sklearn.model_selection import cross_val_score
 from sklearn.externals import joblib
 
@@ -23,27 +25,33 @@ with open('../data/targets.csv', 'rb') as f:
 
 targets = np.asarray([int(x[0]) for x in targets])
 
-data = np.asarray(extractHierarchicalClusters("../data/set_train",50,scale=0.1))
+data = np.asarray(extractHistograms("../data/set_train",4500,45,9))
 print "Shape of data:"
 print np.array(data).shape
 
 print "Estimating error:"
 
 models = {
-	"SVC" : pipeline.make_pipeline(
-		StandardScaler(),
-		SelectKBest(k=40),
-		SVC(kernel='poly', probability=True)
-	),
-	"RandomForestClassifier" : pipeline.make_pipeline(
-		StandardScaler(),
-		RandomForestClassifier(max_depth=20,n_estimators=600,max_features=3)
-	)
+	"SVC (poly)" : SVC(kernel='poly', probability=True),
+	"RandomForestClassifier" : RandomForestClassifier(max_depth=20,n_estimators=700,max_features=200),
+	"SVC (rbf)" : SVC(kernel='rbf', gamma=2, probability=True),
+	"Gaussian" : GaussianProcessClassifier(1.0 * RBF(1.0), warm_start=True),
+	"Neural net" : MLPClassifier(hidden_layer_sizes=(700,),activation='logistic'),
+	"AdaBoost" : AdaBoostClassifier(base_estimator=SVC(kernel='poly',probability=True), n_estimators=700)
 }
+
+voting_model = {"Voting Classifier": VotingClassifier(models.items(), voting='soft',n_jobs=-1)}
+
+models.update(voting_model)
 
 for key, model in sorted(models.items()):
 	print(key)
-	scores = cross_val_score(model, data, targets, cv=10, scoring='neg_log_loss', n_jobs=-1)
+	pl = pipeline.make_pipeline(
+		StandardScaler(),
+		SelectKBest(mutual_info_classif,k=20000),
+		PCA(n_components=1400),
+		model)
+	scores = cross_val_score(pl, data, targets, cv=10, scoring='neg_log_loss', n_jobs=-1)
 	print "score: %0.2f (+/- %0.2f) [%s]" % (-scores.mean(), scores.std(),key)
 
 
