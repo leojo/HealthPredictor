@@ -132,7 +132,6 @@ def extractHierarchicalClusters(imgDirFullPath, n_clusters=10, ignoreCache=False
 	outputFileName = os.path.join(featuresDir,"hierarchicalclusters_"+str(n_clusters)+"_"+str(scale)+"_"+imgDirFullPath.replace(os.sep,"-")+".feature")
 	
 	if os.path.isfile(outputFileName) and not ignoreCache:
-		print("Found!")
 		save = open(outputFileName,'rb')
 		clusters = pickle.load(save)
 		save.close()

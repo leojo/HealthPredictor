@@ -50,10 +50,13 @@ linearly_separable = (X, y)
 
 histoData = np.asarray(extractHistograms("../data/set_train", 4500, 45, 16))
 zoneData = np.asarray(extractZoneAverages("../data/set_train", 8))
+categoryData = np.asarray(extractHistograms("../data/set_train",nBins = 8))
 pcaHisto = PCA(n_components=2)
 pcaHistoData = pcaHisto.fit_transform(histoData)
 pcaZone = PCA(n_components=2)
 pcaZoneData = pcaZone.fit_transform(zoneData)
+pcaCategory = PCA(n_components=2)
+pcaCategoryData = pcaCategory.fit_transform(categoryData)
 # Get the targets
 with open('../data/targets.csv', 'rb') as f:
     reader = csv.reader(f)
@@ -61,8 +64,9 @@ with open('../data/targets.csv', 'rb') as f:
 targets = np.asarray([int(x[0]) for x in targets])           
 myDatasetHisto = (pcaHistoData, targets)
 myDatasetZone = (pcaZoneData, targets)
+myDatasetCategory = (pcaCategoryData, targets)
 
-datasets = [myDatasetHisto, myDatasetZone]
+datasets = [myDatasetHisto, myDatasetZone, myDatasetCategory]
 
 figure = plt.figure(figsize=(27, 9))
 i = 1
