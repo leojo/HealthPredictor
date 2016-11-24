@@ -26,46 +26,88 @@ with open('../data/targets.csv', 'rb') as f:
 
 targets = np.asarray([int(x[0]) for x in targets])
 
-#data = np.asarray(extractHistograms("../data/set_train",1500,4,9))
-data = np.asarray(extractColoredZone("../data/set_train", 450, 800, 8))
-print "Shape of data:"
-print np.array(data).shape
+histo = np.asarray(extractHistograms("../data/set_train",4500,45,9))
+color = np.asarray(extractColoredZone("../data/set_train", 450, 800, 8))
+
+#print "Shape of data:"
+#print np.array(data).shape
 
 print "Estimating error:"
 
-models = {
+color_models = {
 	#"SVC (poly)" : SVC(kernel='poly', probability=True),
 	#"RandomForestClassifier" : RandomForestClassifier(max_depth=20,n_estimators=700,max_features=200),
 	#"SVC (rbf)" : SVC(kernel='rbf', gamma=2, probability=True),
 	#"Gaussian" : GaussianProcessClassifier(1.0 * RBF(1.0), warm_start=True),
 	#"Neural net" : MLPClassifier(hidden_layer_sizes=(700,),activation='logistic'),
 	#"AdaBoost" : AdaBoostClassifier(base_estimator=SVC(kernel='poly',probability=True), n_estimators=700)
-
 	#"Nearest Neighbors":KNeighborsClassifier(3),
-    "Linear SVM":SVC(kernel="linear", C=0.025, probability=True),
-    #"Poly SVM":SVC(kernel="poly", C=0.025, probability=True),
+    #"Linear SVM":SVC(kernel="poly", C=0.025, probability=True),
+    #"Poly SVM":SVC(kernel="poly", C=1.0, probability=True),
     #"RBF SVM":SVC(gamma=2, C=1, probability=True),
     "Gaussian Process":GaussianProcessClassifier(1.0 * RBF(1.0), warm_start=True),
     #"Decision Tree":DecisionTreeClassifier(max_depth=5),
     #"Random Forest":RandomForestClassifier(max_depth=5, n_estimators=10, max_features=1),
     "Neural Net":MLPClassifier(alpha=1),
     #"AdaBoost":AdaBoostClassifier(),
-    "Naive Bayes":GaussianNB(),
-    "QDA":QuadraticDiscriminantAnalysis()
+    #"Naive Bayes":GaussianNB(),
+    #"QDA":QuadraticDiscriminantAnalysis()
 }
 
-voting_model = {"Voting Classifier": VotingClassifier(models.items(), voting='soft',n_jobs=-1)}
+histo_models = {
+	"Poly SVM":SVC(kernel="poly", C=1.0, probability=True),
+	"Gaussian Process":GaussianProcessClassifier(1.0 * RBF(1.0), warm_start=True)
+}
 
-models.update(voting_model)
+voter_color = VotingClassifier(color_models.items(), voting='soft',n_jobs=-1)
+voter_histo = VotingClassifier(histo_models.items(), voting='soft',n_jobs=-1)
 
-for key, model in sorted(models.items()):
+voting_model_color = {"Voting Classifier color": voter_color}
+voting_model_histo = {"Voting Classifier histo": voter_histo}
+
+color_models.update(voting_model_color)
+histo_models.update(voting_model_histo)
+
+for key, model in sorted(color_models.items()):
 	print(key)
 	pl = pipeline.make_pipeline(
 		PCA(n_components=2),
 		StandardScaler(),
 		model)
-	scores = cross_val_score(pl, data, targets, cv=10, scoring='neg_log_loss', n_jobs=-1)
+	scores = cross_val_score(pl, color, targets, cv=10, scoring='neg_log_loss', n_jobs=-1)
 	print "score: %0.2f (+/- %0.2f) [%s]" % (-scores.mean(), scores.std(),key)
+
+for key, model in sorted(histo_models.items()):
+	print(key)
+	pl = pipeline.make_pipeline(
+		PCA(n_components=2),
+		StandardScaler(),
+		model)
+	scores = cross_val_score(pl, histo, targets, cv=10, scoring='neg_log_loss', n_jobs=-1)
+	print "score: %0.2f (+/- %0.2f) [%s]" % (-scores.mean(), scores.std(),key)
+
+print "Train voters"
+voter_color.fit(color,targets)
+voter_histo.fit(histo,targets)
+
+print "Combining voters"
+testData_color = np.array(extractColoredZone("../data/set_test", 450, 800, 8))
+testData_histo = np.array(extractHistograms('../data/set_test',4500,45,9))
+predictions_color = voter_color.predict_proba(testData_color)
+predictions_histo = voter_histo.predict_proba(testData_histo)
+predictions_color_0, predictions_color_1 = zip(*predictions_color)
+predictions_histo_0, predictions_histo_1 = zip(*predictions_histo)
+predictions_1 = (np.asarray(predictions_histo_1)+np.asarray(predictions_color_1))/2
+print predictions_1
+with open('combinedVoters.csv', 'w') as csvfile:
+	resultWriter = csv.writer(csvfile, delimiter=',', quotechar='|')
+	resultWriter.writerow(['ID','Prediction'])
+	for i in range(0,len(predictions_1)):
+		id = str(i+1)
+		p = str(predictions_1[i])
+		row = [id,p]
+		resultWriter.writerow(row)
+	csvfile.close()
 
 
 #hist_targ = zip(data,targets)
