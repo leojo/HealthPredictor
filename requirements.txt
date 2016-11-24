@@ -1,6 +1,6 @@
 cycler==0.10.0
 nibabel==2.1.0
-numpy==1.11.2
+numpy==1.12.0b1
 scipy==0.18.1
 matplotlib==1.5.3
 pyparsing==2.1.10
