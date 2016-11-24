@@ -32,7 +32,7 @@ classifiers = [
     DecisionTreeClassifier(max_depth=5),
     RandomForestClassifier(max_depth=5, n_estimators=10, max_features=1),
     MLPClassifier(alpha=1),
-    AdaBoostClassifier(),
+    AdaBoostClassifier(base_estimator=SVC(kernel="linear", C=0.025, probability=True)),
     GaussianNB(),
     QuadraticDiscriminantAnalysis()]
 
@@ -67,7 +67,6 @@ zoneData = np.asarray(extractZoneAverages("../data/set_train", 8))
 pcaZone = PCA(n_components=2)
 pcaZoneData = pcaZone.fit_transform(zoneData)
 myDatasetZone = (pcaZoneData, targets)
-myDatasetCategory = (pcaCategoryData, targets)
 
 # zones 
 '''
@@ -111,7 +110,12 @@ pcaEvenWhiter = PCA(n_components=2)
 pcaWhiterData = pcaEvenWhiter.fit_transform(evenWhiterData)
 myDatasetWhiter = (pcaWhiterData, targets)
 
-datasets = [myDatasetBlack, myDatasetGray, myDatasetWhite, myDatasetWhiter]
+combinedData = np.concatenate((blackData, grayData, whiteData, evenWhiterData),axis=1)
+pcaCombined = PCA(n_components=2)
+pcaCombinedData = pcaCombined.fit_transform(combinedData)
+myDatasetCombined = (pcaCombinedData, targets)
+print combinedData.shape
+datasets = [myDatasetBlack, myDatasetGray, myDatasetWhite, myDatasetWhiter, myDatasetCombined]
 
 figure = plt.figure(figsize=(27, 9))
 i = 1
@@ -150,8 +154,8 @@ for ds_cnt, ds in enumerate(datasets):
     # iterate over classifiers
     for name, clf in zip(names, classifiers):
         ax = plt.subplot(len(datasets), len(classifiers) + 1, i)
-        clf.fit(X, y)
         score = cross_val_score(clf, X, y, cv=10, scoring='neg_log_loss', n_jobs=-1)#clf.score(X_test, y_test)
+        clf.fit(X, y)
 
         # Plot the decision boundary. For that, we will assign a color to each
         # point in the mesh [x_min, x_max]x[y_min, y_max].
