@@ -11,6 +11,7 @@ from printProgress import printProgress
 
 from sklearn.feature_extraction.image import grid_to_graph
 from sklearn.cluster import AgglomerativeClustering
+from skimage.measure import compare_ssim as ssim
 
 # The directory to store the precomputed features
 featuresDir =  os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
@@ -66,6 +67,74 @@ def extractHistograms(imgDir, maxValue = 4000, nBins = -1, nPartitions = 1):
 
 	return histograms
 
+
+def mse(imageA, imageB):
+	# the 'Mean Squared Error' between the two images is the
+	# sum of the squared difference between the two images;
+	# NOTE: the two images must have the same dimension
+	err = np.sum((imageA.astype("float") - imageB.astype("float")) ** 2)
+	err /= float(reduce(lambda x, y: x*y, imageA.shape))
+	return err
+
+def extractFlipSim(imgDir,nPartitions=8,exponent=50):
+	imgPath = os.path.join(imgDir,"*")
+
+	# This is the cache for the feature, used to make sure we do the heavy computations more often than neccesary
+	outputFileName = os.path.join(featuresDir,"flipsim_"+str(nPartitions)+"-"+str(exponent)+"_"+imgDir.replace(os.sep,"-")+".feature")
+	if os.path.isfile(outputFileName):
+		save = open(outputFileName,'rb')
+		data = pickle.load(save)
+		save.close()
+		return data
+
+	# Fetch all directory listings of set_train and sort them on the image number
+	allImageSrc = sorted(glob.glob(imgPath), key=extractImgNumber)
+	n_samples = len(allImageSrc);
+	print "Found "+str(n_samples)+" images!"
+	print "Preparing the data"
+	data = []
+	printProgress(0, n_samples)
+	for i in range(0,n_samples):
+		img = nib.load(allImageSrc[i])
+		imgData = np.asarray(img.get_data()[:,:,:,0]);
+		imgData_flipped = np.flip(imgData,0)
+		part_size_x = int(round(float(imgData.shape[0])/nPartitions))
+		part_size_y = int(round(float(imgData.shape[1])/nPartitions))
+		part_size_z = int(round(float(imgData.shape[2])/nPartitions))
+		partsSim = []
+		for x in range(nPartitions):
+			for y in range(nPartitions):
+				for z in range(nPartitions):
+					x_start = x*part_size_x
+					if(x == nPartitions-1): x_stop=imgData.shape[0]
+					else: x_stop = (x+1)*part_size_x
+
+					y_start = y*part_size_y
+					if(y == nPartitions-1): y_stop=imgData.shape[1]
+					else: y_stop = (y+1)*part_size_y
+
+					z_start = z*part_size_z
+					if(z == nPartitions-1): z_stop=imgData.shape[2]
+					else: z_stop = (z+1)*part_size_z
+
+					imgPart = imgData[x_start:x_stop,y_start:y_stop,z_start:z_stop]
+					imgPart_flipped = imgData_flipped[x_start:x_stop,y_start:y_stop,z_start:z_stop]
+
+					#ssim_val = ssim(imgPart,imgPart_flipped)
+					mse_val = mse(imgPart,imgPart_flipped)
+					#similarity = [ssim_val**exponent,mse_val]
+					partsSim.append(mse_val)
+		data.append(partsSim)
+		printProgress(i+1, n_samples)
+
+	print "\nStoring the features in "+outputFileName
+	output = open(outputFileName,"wb")
+	pickle.dump(data,output)
+	output.close()
+	print "Done"
+
+	return data
+
 def extractCompleteBrain(imgDir):
 	imgPath = os.path.join(imgDir,"*")
 	# This is the cache for the feature, used to make sure we do the heavy computations more often than neccesary
@@ -110,18 +179,17 @@ def extractBrainPart(imgDir,n_divisions=3,x_part=0,y_part=0,z_part=0):
 	for i in range(0,n_samples):
 		img = nib.load(allImageSrc[i])
 		imgData = img.get_data();
-		single_brain = []
-		for x in range((x_part)*imgData.shape[0]/n_divisions,(x_part+1)*imgData.shape[0]/n_divisions):
-			for y in range((y_part)*imgData.shape[1]/n_divisions,(y_part+1)*imgData.shape[1]/n_divisions):
-				for z in range((z_part)*imgData.shape[2]/n_divisions,(z_part+1)*imgData.shape[2]/n_divisions):
-					single_brain.append(imgData[x][y][z][0])
-		data.append(single_brain)
+		# Resize to a <scale> proportion of original size
+		imgData_resized = sp.ndimage.interpolation.zoom(imgData_original,scale)
+		imgData_flipped = np.flip(imgData_resized,0)
+		
+		data.append([similarity])
 		printProgress(i+1, n_samples)
-	print "\n!!!!!NOT Storing the features !!!!"
-	#output = open(outputFileName,"wb")
-	#pickle.dump(data,output)
-	#output.close()
-	#print "Done"
+	print "\nStoring the features in "+outputFileName
+	output = open(outputFileName,"wb")
+	pickle.dump(data,output)
+	output.close()
+	print "Done"
 	return data
 
 # This was an attempt at a more sophisticated feature using agglomerative clustering to define "colors"
@@ -404,8 +472,6 @@ def extractColoredZone(imgDir, minColor, maxColor, nPartitions=1):
 	output.close()
 	print "Done"
 	return allColoredZones
-
-
 
 def extractImgNumber(imgPath):
 	imgName = imgPath.split(os.sep)[-1]
