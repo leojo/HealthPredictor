@@ -54,7 +54,7 @@ with open('../data/targets.csv', 'rb') as f:
     targets = list(reader)
 targets = np.asarray([int(x[0]) for x in targets])           
 
-
+'''
 #histograms
 histoData = np.asarray(extractHistograms("../data/set_train", 4500, 45, 16))
 pcaHisto = PCA(n_components=2)
@@ -69,7 +69,6 @@ pcaZoneData = pcaZone.fit_transform(zoneData)
 myDatasetZone = (pcaZoneData, targets)
 
 # zones 
-'''
 blackData = np.asarray(extractBlackzones("../data/set_train", 8))
 pcaBlack = PCA(n_components=2)
 pcaBlackData = pcaBlack.fit_transform(blackData)
@@ -90,32 +89,32 @@ pcaBlackData3 = pcaBlack3.fit_transform(blackData3)
 myDatasetBlack3 = (pcaBlackData3, targets)'''
 
 # zones
-blackData = np.asarray(extractColoredZone("../data/set_train", 1, 450, 8))
-pcaBlack = PCA(n_components=2)
-pcaBlackData = pcaBlack.fit_transform(blackData)
-myDatasetBlack = (pcaBlackData, targets)
+fullData = np.asarray(extractFlipSim("../data/set_train"),scale = 0.1)
+pcaFull = PCA(n_components=2)
+pcaFullData = pcaFull.fit_transform(fullData)
+myDatasetFull = (pcaFullData, targets)
+'''
+fourFifthsData = np.asarray(extractFlipSim("../data/set_train", scale = 0.2))
+pcaFourFifths = PCA(n_components=2)
+pcaFourFifthsData = pcaFourFifths.fit_transform(fourFifthsData)
+myDatasetFourFifths = (pcaFourFifthsData, targets)
 
-grayData = np.asarray(extractColoredZone("../data/set_train", 450, 800, 8))
-pcaGray = PCA(n_components=2)
-pcaGrayData = pcaGray.fit_transform(grayData)
-myDatasetGray = (pcaGrayData, targets)
+threeFifthsData = np.asarray(extractFlipSim("../data/set_train", scale = 0.15))
+pcaThreeFifths = PCA(n_components=2)
+pcaThreeFifthsData = pcaThreeFifths.fit_transform(threeFifthsData)
+myDatasetThreeFifths = (pcaThreeFifthsData, targets)
 
-whiteData = np.asarray(extractColoredZone("../data/set_train", 800, 1500, 8))
-pcaWhite = PCA(n_components=2)
-pcaWhiteData = pcaWhite.fit_transform(whiteData)
-myDatasetWhite = (pcaWhiteData, targets)
+twoFifthsData = np.asarray(extractFlipSim("../data/set_train", scale = 0.1))
+pcaTwoFifths = PCA(n_components=2)
+pcaTwoFifthsData = pcaTwoFifths.fit_transform(twoFifthsData)
+myDatasetTwoFifths = (pcaTwoFifthsData, targets)
 
-evenWhiterData = np.asarray(extractColoredZone("../data/set_train", 1500, 4000, 8))
-pcaEvenWhiter = PCA(n_components=2)
-pcaWhiterData = pcaEvenWhiter.fit_transform(evenWhiterData)
-myDatasetWhiter = (pcaWhiterData, targets)
-
-combinedData = np.concatenate((blackData, grayData, whiteData, evenWhiterData),axis=1)
-pcaCombined = PCA(n_components=2)
-pcaCombinedData = pcaCombined.fit_transform(combinedData)
-myDatasetCombined = (pcaCombinedData, targets)
-print combinedData.shape
-datasets = [myDatasetBlack, myDatasetGray, myDatasetWhite, myDatasetWhiter, myDatasetCombined]
+oneFifthData = np.asarray(extractFlipSim("../data/set_train", scale = 0.05))
+pcaOneFifth = PCA(n_components=2)
+pcaOneFifthData = pcaOneFifth.fit_transform(oneFifthData)
+myDatasetOneFifth = (pcaOneFifthData, targets)
+print oneFifthData.shape'''
+datasets = [myDatasetFull]#, myDatasetFourFifths, myDatasetThreeFifths, myDatasetTwoFifths, myDatasetOneFifth]
 
 figure = plt.figure(figsize=(27, 9))
 i = 1

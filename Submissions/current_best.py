@@ -22,9 +22,9 @@ histograms = np.array(extractHistograms("../data/set_train",4500,45,9))
 
 print "Training model"
 model = pipeline.make_pipeline(
-		StandardScaler(),
 		SelectKBest(k=20000),
 		PCA(n_components=1000),
+		StandardScaler(),
 		RandomForestClassifier(max_depth=20,n_estimators=600,max_features=200)
 		)
 model.fit(histograms,targets)
