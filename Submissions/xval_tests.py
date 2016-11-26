@@ -77,6 +77,7 @@ test_data = np.asarray(extractColoredZone("../data/set_test", 450, 800, 8))
 model = pipeline.make_pipeline(
 		PCA(n_components=2),
 		StandardScaler(),
+<<<<<<< HEAD
 		voter
 		)
 
@@ -85,6 +86,52 @@ model.fit(data,targets)
 print "predicting"
 predictions = model.predict_proba(test_data)
 predictions_0, predictions_1 = zip(*predictions)
+=======
+		model)
+	scores = cross_val_score(pl, histo, targets, cv=10, scoring='neg_log_loss', n_jobs=-1)
+	print "score: %0.2f (+/- %0.2f) [%s]" % (-scores.mean(), scores.std(),key)
+
+print "Train voters"
+<<<<<<< HEAD
+model_color = pipeline.make_pipeline(
+		PCA(n_components=2),
+		StandardScaler(),
+		voter_color
+	)
+model_histo = pipeline.make_pipeline(
+		PCA(n_components=2),
+		StandardScaler(),
+		voter_histo
+	)
+model_color.fit(color,targets)
+model_histo.fit(histo,targets)
+=======
+voter_color.fit(color,targets)
+voter_histo.fit(histo,targets)
+>>>>>>> 2f29850d321756c0d3cb3f82f4bfef7b922fa2a6
+
+print "Combining voters"
+testData_color = np.array(extractColoredZone("../data/set_test", 450, 800, 8))
+testData_histo = np.array(extractHistograms('../data/set_test',4500,45,9))
+<<<<<<< HEAD
+predictions_color = model_color.predict_proba(testData_color)
+predictions_histo = model_histo.predict_proba(testData_histo)
+predictions_color_0, predictions_color_1 = zip(*predictions_color)
+predictions_histo_0, predictions_histo_1 = zip(*predictions_histo)
+predictions_1 = (np.asarray(predictions_histo_1)+np.asarray(predictions_color_1))/2
+print "Predictions by color"
+print predictions_color_1
+print "Predictions by histo"
+print predictions_histo_1
+print "Combined predictions"
+=======
+predictions_color = voter_color.predict_proba(testData_color)
+predictions_histo = voter_histo.predict_proba(testData_histo)
+predictions_color_0, predictions_color_1 = zip(*predictions_color)
+predictions_histo_0, predictions_histo_1 = zip(*predictions_histo)
+predictions_1 = (np.asarray(predictions_histo_1)+np.asarray(predictions_color_1))/2
+>>>>>>> 2f29850d321756c0d3cb3f82f4bfef7b922fa2a6
+>>>>>>> 975d874a910e58bf95b3c239225b5f4dc5223c25
 print predictions_1
 #hist_targ = zip(data,targets)
 #shuffle(hist_targ)

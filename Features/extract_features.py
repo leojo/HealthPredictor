@@ -422,6 +422,196 @@ def extractBlackzones(imgDir, nPartitions=1):
 	print "Done"
 	return allBlackZones
 
+<<<<<<< HEAD
+def extractThreeColors(imgDir, darkColor, grayColor, whiteColor, nPartitions=1):
+	imgPath = os.path.join(imgDir,"*")
+
+	# This is the cache for the feature, used to make sure we do the heavy computations more often than neccesary
+	outputFileName = os.path.join(featuresDir,"threeColors_"+str(nPartitions)+"_"+str(darkColor)+"_"+str(grayColor)+"_"+str(whiteColor)+"_"+imgDir.replace(os.sep,"-")+".feature")
+	if os.path.isfile(outputFileName):
+		save = open(outputFileName,'rb')
+		zoneAverages = pickle.load(save)
+		save.close()
+		return zoneAverages
+
+	# Fetch all directory listings of set_train and sort them on the image number
+	allImageSrc = sorted(glob.glob(imgPath), key=extractImgNumber)
+	n_samples = len(allImageSrc);
+	print "Found "+str(n_samples)+" images!"
+	print "Preparing the data"
+	printProgress(0, n_samples)
+	
+
+	allPercentages = []
+	for i in range(0,n_samples):
+		img = nib.load(allImageSrc[i])
+		imgData = img.get_data();
+		imgDataDisected = imgData[:, :, :, 0]
+
+		percentages = []
+		voxelsCounted = 0.0
+		blackCounted = 0		
+		grayCounted = 0
+		whiteCounted = 0
+		for j in range(0, imgData.shape[0]):
+			for k in range(0, imgData.shape[1]):
+				for l in range(0, imgData.shape[2]):
+					value = imgDataDisected[j][k][l]
+					if value > 0:
+						voxelsCounted += 1
+						if value <= darkColor:
+							blackCounted += 1
+						if value <= grayColor and value > darkColor:
+							grayCounted+= 1
+						if value <= whiteColor and value > grayColor:
+							whiteCounted += 1
+
+		if(voxelsCounted > 0):
+			percentages.append(blackCounted/voxelsCounted)
+			percentages.append(grayCounted/voxelsCounted)
+			percentages.append(whiteCounted/voxelsCounted)
+
+		allPercentages.append(percentages)
+		printProgress(i+1, n_samples)		
+		
+
+	print "\nStoring the features in "+outputFileName
+	output = open(outputFileName,"wb")
+	pickle.dump(allPercentages,output)
+	output.close()
+	print "Done"
+	return allPercentages
+
+def extractColorPercentage(imgDir, upperDark, upperGray, firstColor, secondColor):
+	imgPath = os.path.join(imgDir,"*")
+
+	# This is the cache for the feature, used to make sure we do the heavy computations more often than neccesary
+	outputFileName = os.path.join(featuresDir,"2ColorPercentage_"+str(upperDark)+"_"+str(upperGray)+"_"+str(firstColor)+"_"+str(secondColor)+"_"+imgDir.replace(os.sep,"-")+".feature")
+	if os.path.isfile(outputFileName):
+		save = open(outputFileName,'rb')
+		zoneAverages = pickle.load(save)
+		save.close()
+		return zoneAverages
+
+	# Fetch all directory listings of set_train and sort them on the image number
+	allImageSrc = sorted(glob.glob(imgPath), key=extractImgNumber)
+	n_samples = len(allImageSrc);
+	print "Found "+str(n_samples)+" images!"
+	print "Preparing the data"
+	printProgress(0, n_samples)
+	
+
+	allPercentages = []
+	for i in range(0,n_samples):
+		img = nib.load(allImageSrc[i])
+		imgData = img.get_data();
+		imgDataSlice = imgData[:, :, imgData.shape[2]/2, 0]
+
+		COUNTS = []
+		voxelsCounted = 0.0
+		blackCounted = 0		
+		grayCounted = 0
+		whiteCounted = 0
+		for j in range(0, imgData.shape[0]):
+			for k in range(0, imgData.shape[1]):
+					value = imgDataSlice[j][k]
+					if value > 0:
+						voxelsCounted += 1
+						if value <= upperDark:
+							blackCounted += 1
+						if value <= upperGray and value > upperDark:
+							grayCounted+= 1
+						if value > upperGray:
+							whiteCounted += 1
+
+		if(voxelsCounted > 0):
+			COUNTS.append(blackCounted)
+			COUNTS.append(grayCounted)
+			COUNTS.append(whiteCounted)
+
+		allPercentages.append(COUNTS[firstColor]/COUNTS[secondColor])
+		printProgress(i+1, n_samples)		
+		
+
+	print "\nStoring the features in "+outputFileName
+	output = open(outputFileName,"wb")
+	pickle.dump(allPercentages,output)
+	output.close()
+	print "Done"
+	return allPercentages
+
+def extractColorPercentage(imgDir, upperDark, upperGray):
+	imgPath = os.path.join(imgDir,"*")
+
+	# This is the cache for the feature, used to make sure we do the heavy computations more often than neccesary
+	outputFileName = os.path.join(featuresDir,"2ColorPercentage_"+str(upperDark)+"_"+str(upperGray)+"_"+imgDir.replace(os.sep,"-")+".feature")
+	if os.path.isfile(outputFileName):
+		save = open(outputFileName,'rb')
+		zoneAverages = pickle.load(save)
+		save.close()
+		return zoneAverages
+
+	# Fetch all directory listings of set_train and sort them on the image number
+	allImageSrc = sorted(glob.glob(imgPath), key=extractImgNumber)
+	n_samples = len(allImageSrc);
+	print "Found "+str(n_samples)+" images!"
+	print "Preparing the data"
+	printProgress(0, n_samples)
+	
+
+	allPercentages = []
+	for i in range(0,n_samples):
+		img = nib.load(allImageSrc[i])
+		imgData = img.get_data();
+
+		imgDataSlice1 = imgData[:, :, imgData.shape[2]/2 + imgData.shape[2]/4, 0]
+		imgDataSlice2 = imgData[:, :, imgData.shape[2]/2, 0]
+		imgDataSlice3 = imgData[:, :, imgData.shape[2]/2 - imgData.shape[2]/4, 0]
+
+		COUNTS = []
+		ratios = []
+		voxelsCounted = 0.0
+		blackCounted = 1		
+		grayCounted = 1
+		whiteCounted = 1
+		for j in range(0, imgData.shape[0]):
+			for k in range(0, imgData.shape[1]):
+					values = []
+					values.append(imgDataSlice1[j][k])
+					values.append(imgDataSlice2[j][k])
+					values.append(imgDataSlice3[j][k])
+					for value in values:
+						if value > 0:
+							voxelsCounted += 1
+							if value <= upperDark:
+								blackCounted += 1
+							if value <= upperGray and value > upperDark:
+								grayCounted+= 1
+							if value > upperGray:
+								whiteCounted += 1
+
+		if(voxelsCounted > 0):
+			#COUNTS.append(blackCounted)
+			COUNTS.append(grayCounted)
+			COUNTS.append(whiteCounted)
+
+		#ratios.append((1.0*COUNTS[0])/COUNTS[1])
+		#ratios.append((1.0*COUNTS[1])/COUNTS[2])
+		#ratios.append((1.0*COUNTS[0])/COUNTS[2])
+
+		allPercentages.append(COUNTS)
+		#printProgress(i+1, n_samples)		
+		
+
+	print "\nStoring the features in "+outputFileName
+	output = open(outputFileName,"wb")
+	pickle.dump(allPercentages,output)
+	output.close()
+	print "Done"
+	return allPercentages
+
+=======
+>>>>>>> 2f29850d321756c0d3cb3f82f4bfef7b922fa2a6
 
 # Written for 2D for faster computing while testing
 def extractColoredZone(imgDir, minColor, maxColor, nPartitions=1):
@@ -473,6 +663,61 @@ def extractColoredZone(imgDir, minColor, maxColor, nPartitions=1):
 	print "Done"
 	return allColoredZones
 
+<<<<<<< HEAD
+
+# Written for 3D
+def extractColoredZone3D(imgDir, minColor, maxColor, nPartitions=1):
+	imgPath = os.path.join(imgDir,"*")
+
+	allColoredZones = []
+
+	# This is the cache for the feature, used to make sure we do the heavy computations more often than neccesary
+	outputFileName = os.path.join(featuresDir,"coloredzones_"+str(nPartitions)+"_"+str(minColor)+"_"+str(maxColor)+"_"+imgDir.replace(os.sep,"-")+".feature")
+	if os.path.isfile(outputFileName):
+		save = open(outputFileName,'rb')
+		zoneAverages = pickle.load(save)
+		save.close()
+		return zoneAverages
+
+	# Fetch all directory listings of set_train and sort them on the image number
+	allImageSrc = sorted(glob.glob(imgPath), key=extractImgNumber)
+	n_samples = len(allImageSrc);
+	print "Found "+str(n_samples)+" images!"
+	print "Preparing the data"
+	printProgress(0, n_samples)
+	for i in range(0,n_samples):
+		img = nib.load(allImageSrc[i])
+		imgData = img.get_data();
+		imgDataDisected = imgData[:, :, :, 0]
+
+		colZones = np.asarray([[[0]*nPartitions]*nPartitions]*nPartitions)
+		# Size should be same for all dimensions, imgData should
+		# have same dimensions for x, y, z all such that they can be
+		# divided by nPartitions
+		for x in range(imgDataDisected.shape[0]):
+			for y in range(imgDataDisected.shape[1]):
+				for z in range(imgDataDisected.shape[2]):
+					val = imgDataDisected[x][y]#[z]
+					partX = int((x*nPartitions)/imgDataDisected.shape[0])
+					partY = int((y*nPartitions)/imgDataDisected.shape[1])
+					partZ = int((z*nPartitions)/imgDataDisected.shape[2])
+					if val <= maxColor and val >= minColor:
+						colZones[partX][partY][partZ] += 1
+
+		allColoredZones.append(colZones.flatten().tolist())
+		printProgress(i+1, n_samples)		
+		
+
+	print "\nStoring the features in "+outputFileName
+	output = open(outputFileName,"wb")
+	pickle.dump(allColoredZones,output)
+	output.close()
+	print "Done"
+	return allColoredZones
+
+
+=======
+>>>>>>> 2f29850d321756c0d3cb3f82f4bfef7b922fa2a6
 def extractImgNumber(imgPath):
 	imgName = imgPath.split(os.sep)[-1]
 	imgNum = int(imgName.split('_')[-1][:-4])
