@@ -13,10 +13,17 @@ print imgHalfZ
 import matplotlib.pyplot as plt
 def show_slices(slices):
     """ Function to display row of image slices """
+<<<<<<< HEAD
     fig, axes = plt.subplots(1, len(slices))
     for i, slice in enumerate(slices):
         axes[i].imshow(slice.T, cmap="gray", origin="lower")
         #axes[3+i].hist(slices[i].ravel())
+=======
+    fig, axes = plt.subplots(1, 2*len(slices))
+    for i, slice in enumerate(slices):
+        axes[i].imshow(slice.T, cmap="gray", origin="lower")
+        axes[3+i].hist(slices[i].ravel())
+>>>>>>> 2f29850d321756c0d3cb3f82f4bfef7b922fa2a6
 
 
     
@@ -24,10 +31,17 @@ def show_slices(slices):
 #slice_0 = epi_img_data[imgHalfX, 75:153, 74:107, 0]
 #slice_1 = epi_img_data[65:109, imgHalfY, 55:110, 0]
 #slice_2 = epi_img_data[52:120, 65:150, imgHalfZ, 0]
+<<<<<<< HEAD
 print imgShape
 slice_0 = epi_img_data[imgHalfX, 35:163, 30:158, 0]
 slice_1 = epi_img_data[ 20:148, imgHalfY, 30:158, 0]
 slice_2 = epi_img_data[ 20:148,  35:163, imgHalfZ, 0]
+=======
+
+slice_0 = epi_img_data[imgHalfX, 40:170, 40:150, 0]
+slice_1 = epi_img_data[ 40:130, imgHalfY, 40:150, 0]
+slice_2 = epi_img_data[ 40:130,  40:170, imgHalfZ, 0]
+>>>>>>> 2f29850d321756c0d3cb3f82f4bfef7b922fa2a6
 
 
 

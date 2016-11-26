@@ -1,6 +1,9 @@
 import nibabel as nib
 import sys
+<<<<<<< HEAD
 import copy
+=======
+>>>>>>> 2f29850d321756c0d3cb3f82f4bfef7b922fa2a6
 
 imgNumber = str(sys.argv[1])
 image = nib.load('../data/set_train/train_'+imgNumber+'.nii')
@@ -20,6 +23,7 @@ def show_slices(slices):
 slice_0 = epi_img_data[imgHalfX, :, :, 0]
 slice_1 = epi_img_data[:, imgHalfY, :, 0]
 slice_2 = epi_img_data[:, :, imgHalfZ, 0]
+<<<<<<< HEAD
 modifiedSlice = copy.deepcopy(slice_2)
 
 darkColor = 350
@@ -41,6 +45,9 @@ for i in range(0, epi_img_data.shape[0]):
 
 
 show_slices([slice_2, modifiedSlice])
+=======
+show_slices([slice_0, slice_1, slice_2])
+>>>>>>> 2f29850d321756c0d3cb3f82f4bfef7b922fa2a6
 plt.suptitle("Center slices for EPI image")  
 plt.show()
 

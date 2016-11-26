@@ -1,4 +1,7 @@
 data/*
 *.tar.gz
 *.pyc
+<<<<<<< HEAD
 FeaturesNotForGit/*
+=======
+>>>>>>> 2f29850d321756c0d3cb3f82f4bfef7b922fa2a6

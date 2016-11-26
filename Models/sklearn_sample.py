@@ -12,13 +12,37 @@ from sklearn.gaussian_process.kernels import RBF
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
 from sklearn.naive_bayes import GaussianNB
+<<<<<<< HEAD
 from sklearn.linear_model import LogisticRegression, SGDClassifier
+=======
+>>>>>>> 2f29850d321756c0d3cb3f82f4bfef7b922fa2a6
 from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
 from Features.extract_features import *
 import csv
 from sklearn.decomposition import PCA
 from sklearn.model_selection import cross_val_score
+<<<<<<< HEAD
 from sklearn.feature_selection import SelectKBest
+=======
+
+h = .02  # step size in the mesh
+
+names = ["Nearest Neighbors", "Linear SVM", "RBF SVM", "Gaussian Process",
+         "Decision Tree", "Random Forest", "Neural Net", "AdaBoost",
+         "Naive Bayes", "QDA"]
+
+classifiers = [
+    KNeighborsClassifier(3),
+    SVC(kernel="linear", C=0.025, probability=True),
+    SVC(gamma=2, C=1, probability=True),
+    GaussianProcessClassifier(1.0 * RBF(1.0), warm_start=True),
+    DecisionTreeClassifier(max_depth=5),
+    RandomForestClassifier(max_depth=5, n_estimators=10, max_features=1),
+    MLPClassifier(alpha=1),
+    AdaBoostClassifier(base_estimator=SVC(kernel="linear", C=0.025, probability=True)),
+    GaussianNB(),
+    QuadraticDiscriminantAnalysis()]
+>>>>>>> 2f29850d321756c0d3cb3f82f4bfef7b922fa2a6
 
 '''
 X, y = make_classification(n_features=2, n_redundant=0, n_informative=2,
@@ -30,12 +54,26 @@ linearly_separable = (X, y)
 '''datasets = [make_moons(noise=0.3, random_state=0),
             make_circles(noise=0.2, factor=0.5, random_state=1),
             linearly_separable
+<<<<<<< HEAD
             ]
 '''
          
 '''
 #histograms
 histoData = np.asarray(extractHistograms("../data/set_train", 1500, 45, 16))
+=======
+            ]'''
+
+# Get the targets
+with open('../data/targets.csv', 'rb') as f:
+    reader = csv.reader(f)
+    targets = list(reader)
+targets = np.asarray([int(x[0]) for x in targets])           
+
+
+#histograms
+histoData = np.asarray(extractHistograms("../data/set_train", 4500, 45, 16))
+>>>>>>> 2f29850d321756c0d3cb3f82f4bfef7b922fa2a6
 pcaHisto = PCA(n_components=2)
 pcaHistoData = pcaHisto.fit_transform(histoData)
 myDatasetHisto = (pcaHistoData, targets)
@@ -48,7 +86,11 @@ pcaZoneData = pcaZone.fit_transform(zoneData)
 myDatasetZone = (pcaZoneData, targets)
 
 # zones 
+<<<<<<< HEAD
 
+=======
+'''
+>>>>>>> 2f29850d321756c0d3cb3f82f4bfef7b922fa2a6
 blackData = np.asarray(extractBlackzones("../data/set_train", 8))
 pcaBlack = PCA(n_components=2)
 pcaBlackData = pcaBlack.fit_transform(blackData)
@@ -66,10 +108,16 @@ blackData3 = np.log10((blackData3+np.asarray([[1]*len(blackData3[0])]*len(blackD
 print blackData3
 pcaBlack3 = PCA(n_components=2)
 pcaBlackData3 = pcaBlack3.fit_transform(blackData3)
+<<<<<<< HEAD
 myDatasetBlack3 = (pcaBlackData3, targets)
 
 # zones
 
+=======
+myDatasetBlack3 = (pcaBlackData3, targets)'''
+
+# zones
+>>>>>>> 2f29850d321756c0d3cb3f82f4bfef7b922fa2a6
 blackData = np.asarray(extractColoredZone("../data/set_train", 1, 450, 8))
 pcaBlack = PCA(n_components=2)
 pcaBlackData = pcaBlack.fit_transform(blackData)
@@ -80,12 +128,15 @@ pcaGray = PCA(n_components=2)
 pcaGrayData = pcaGray.fit_transform(grayData)
 myDatasetGray = (pcaGrayData, targets)
 
+<<<<<<< HEAD
 grayData2 = np.asarray(extractColoredZone("../data/set_train", 450, 800, 8))
 grayData2 = np.log10((grayData2+np.asarray([[1]*len(grayData2[0])]*len(grayData2))))
 pcaGray2 = PCA(n_components=2)
 pcaGrayData2 = pcaGray2.fit_transform(grayData2)
 myDatasetGray2 = (pcaGrayData2, targets)
 
+=======
+>>>>>>> 2f29850d321756c0d3cb3f82f4bfef7b922fa2a6
 whiteData = np.asarray(extractColoredZone("../data/set_train", 800, 1500, 8))
 pcaWhite = PCA(n_components=2)
 pcaWhiteData = pcaWhite.fit_transform(whiteData)
@@ -96,6 +147,7 @@ pcaEvenWhiter = PCA(n_components=2)
 pcaWhiterData = pcaEvenWhiter.fit_transform(evenWhiterData)
 myDatasetWhiter = (pcaWhiterData, targets)
 
+<<<<<<< HEAD
 
 
 blackData = np.asarray(extractColoredZone("../data/set_train", 200, 750, 16))
@@ -235,6 +287,14 @@ datasets = [myDatasetGray, myDatasetHisto, myDatasetGray3D]
 
 
 
+=======
+combinedData = np.concatenate((blackData, grayData, whiteData, evenWhiterData),axis=1)
+pcaCombined = PCA(n_components=2)
+pcaCombinedData = pcaCombined.fit_transform(combinedData)
+myDatasetCombined = (pcaCombinedData, targets)
+print combinedData.shape
+datasets = [myDatasetBlack, myDatasetGray, myDatasetWhite, myDatasetWhiter, myDatasetCombined]
+>>>>>>> 2f29850d321756c0d3cb3f82f4bfef7b922fa2a6
 
 figure = plt.figure(figsize=(27, 9))
 i = 1

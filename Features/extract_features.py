@@ -422,6 +422,7 @@ def extractBlackzones(imgDir, nPartitions=1):
 	print "Done"
 	return allBlackZones
 
+<<<<<<< HEAD
 def extractThreeColors(imgDir, darkColor, grayColor, whiteColor, nPartitions=1):
 	imgPath = os.path.join(imgDir,"*")
 
@@ -609,6 +610,8 @@ def extractColorPercentage(imgDir, upperDark, upperGray):
 	print "Done"
 	return allPercentages
 
+=======
+>>>>>>> 2f29850d321756c0d3cb3f82f4bfef7b922fa2a6
 
 # Written for 2D for faster computing while testing
 def extractColoredZone(imgDir, minColor, maxColor, nPartitions=1):
@@ -660,6 +663,7 @@ def extractColoredZone(imgDir, minColor, maxColor, nPartitions=1):
 	print "Done"
 	return allColoredZones
 
+<<<<<<< HEAD
 
 # Written for 3D
 def extractColoredZone3D(imgDir, minColor, maxColor, nPartitions=1):
@@ -712,6 +716,8 @@ def extractColoredZone3D(imgDir, minColor, maxColor, nPartitions=1):
 	return allColoredZones
 
 
+=======
+>>>>>>> 2f29850d321756c0d3cb3f82f4bfef7b922fa2a6
 def extractImgNumber(imgPath):
 	imgName = imgPath.split(os.sep)[-1]
 	imgNum = int(imgName.split('_')[-1][:-4])

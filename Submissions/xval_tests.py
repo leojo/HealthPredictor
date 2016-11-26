@@ -87,6 +87,7 @@ for key, model in sorted(histo_models.items()):
 	print "score: %0.2f (+/- %0.2f) [%s]" % (-scores.mean(), scores.std(),key)
 
 print "Train voters"
+<<<<<<< HEAD
 model_color = pipeline.make_pipeline(
 		PCA(n_components=2),
 		StandardScaler(),
@@ -99,10 +100,15 @@ model_histo = pipeline.make_pipeline(
 	)
 model_color.fit(color,targets)
 model_histo.fit(histo,targets)
+=======
+voter_color.fit(color,targets)
+voter_histo.fit(histo,targets)
+>>>>>>> 2f29850d321756c0d3cb3f82f4bfef7b922fa2a6
 
 print "Combining voters"
 testData_color = np.array(extractColoredZone("../data/set_test", 450, 800, 8))
 testData_histo = np.array(extractHistograms('../data/set_test',4500,45,9))
+<<<<<<< HEAD
 predictions_color = model_color.predict_proba(testData_color)
 predictions_histo = model_histo.predict_proba(testData_histo)
 predictions_color_0, predictions_color_1 = zip(*predictions_color)
@@ -113,6 +119,13 @@ print predictions_color_1
 print "Predictions by histo"
 print predictions_histo_1
 print "Combined predictions"
+=======
+predictions_color = voter_color.predict_proba(testData_color)
+predictions_histo = voter_histo.predict_proba(testData_histo)
+predictions_color_0, predictions_color_1 = zip(*predictions_color)
+predictions_histo_0, predictions_histo_1 = zip(*predictions_histo)
+predictions_1 = (np.asarray(predictions_histo_1)+np.asarray(predictions_color_1))/2
+>>>>>>> 2f29850d321756c0d3cb3f82f4bfef7b922fa2a6
 print predictions_1
 with open('combinedVoters.csv', 'w') as csvfile:
 	resultWriter = csv.writer(csvfile, delimiter=',', quotechar='|')
