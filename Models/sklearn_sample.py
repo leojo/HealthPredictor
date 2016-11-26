@@ -12,30 +12,13 @@ from sklearn.gaussian_process.kernels import RBF
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
 from sklearn.naive_bayes import GaussianNB
+from sklearn.linear_model import LogisticRegression, SGDClassifier
 from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
 from Features.extract_features import *
 import csv
 from sklearn.decomposition import PCA
 from sklearn.model_selection import cross_val_score
 from sklearn.feature_selection import SelectKBest
-
-h = .02  # step size in the mesh
-
-names = ["Nearest Neighbors", "Linear SVM", "RBF SVM", "Gaussian Process",
-         "Poly SVM", "Random Forest", "Neural Net", "AdaBoost",
-         "Naive Bayes", "QDA"]
-
-classifiers = [
-    KNeighborsClassifier(3),
-    SVC(kernel="linear", C=0.025, probability=True),
-    SVC(gamma=2, C=1, probability=True),
-    GaussianProcessClassifier(1.0 * RBF(1.0), warm_start=True),
-    SVC(kernel="poly", C=1.0, probability=True), 
-    RandomForestClassifier(max_depth=5, n_estimators=10, max_features=1),
-    MLPClassifier(alpha=1),
-    AdaBoostClassifier(),
-    GaussianNB(),
-    QuadraticDiscriminantAnalysis()]
 
 '''
 X, y = make_classification(n_features=2, n_redundant=0, n_informative=2,
@@ -47,15 +30,10 @@ linearly_separable = (X, y)
 '''datasets = [make_moons(noise=0.3, random_state=0),
             make_circles(noise=0.2, factor=0.5, random_state=1),
             linearly_separable
-            ]'''
-
-# Get the targets
-with open('../data/targets.csv', 'rb') as f:
-    reader = csv.reader(f)
-    targets = list(reader)
-targets = np.asarray([int(x[0]) for x in targets])           
-
-
+            ]
+'''
+         
+'''
 #histograms
 histoData = np.asarray(extractHistograms("../data/set_train", 1500, 45, 16))
 pcaHisto = PCA(n_components=2)
@@ -70,7 +48,7 @@ pcaZoneData = pcaZone.fit_transform(zoneData)
 myDatasetZone = (pcaZoneData, targets)
 
 # zones 
-'''
+
 blackData = np.asarray(extractBlackzones("../data/set_train", 8))
 pcaBlack = PCA(n_components=2)
 pcaBlackData = pcaBlack.fit_transform(blackData)
@@ -88,10 +66,10 @@ blackData3 = np.log10((blackData3+np.asarray([[1]*len(blackData3[0])]*len(blackD
 print blackData3
 pcaBlack3 = PCA(n_components=2)
 pcaBlackData3 = pcaBlack3.fit_transform(blackData3)
-myDatasetBlack3 = (pcaBlackData3, targets)'''
+myDatasetBlack3 = (pcaBlackData3, targets)
 
 # zones
-'''
+
 blackData = np.asarray(extractColoredZone("../data/set_train", 1, 450, 8))
 pcaBlack = PCA(n_components=2)
 pcaBlackData = pcaBlack.fit_transform(blackData)
@@ -117,15 +95,16 @@ evenWhiterData = np.asarray(extractColoredZone("../data/set_train", 1500, 4000, 
 pcaEvenWhiter = PCA(n_components=2)
 pcaWhiterData = pcaEvenWhiter.fit_transform(evenWhiterData)
 myDatasetWhiter = (pcaWhiterData, targets)
-'''
+
+
 
 blackData = np.asarray(extractColoredZone("../data/set_train", 200, 750, 16))
 #bestSelectorBlack = SelectKBest(k=20)
 pcaBlack = PCA(n_components=2)
 #pcaBlackData = bestSelectorBlack.fit_transform(blackData, targets)
-pcaBlackData = pcaBlack.fit_transform(pcaBlack)
+pcaBlackData = pcaBlack.fit_transform(blackData)
 myDatasetBlack = (pcaBlackData, targets)
-'''
+
 grayData = np.asarray(extractColoredZone("../data/set_train", 400, 800, 8))
 bestSelectorGray = SelectKBest(k=100)
 pcaGray = PCA(n_components=2)
@@ -146,10 +125,110 @@ pcaEvenWhiter = PCA(n_components=2)
 pcaWhiterData = bestSelectorWhiter.fit_transform(evenWhiterData, targets)
 pcaWhiterData = pcaEvenWhiter.fit_transform(pcaWhiterData)
 myDatasetWhiter = (pcaWhiterData, targets)
+
+
+threeColorData = np.asarray(extractThreeColors("../data/set_train", 8, 450, 650, 1500))
+pcaThreeColor = PCA(n_components=2)
+pcaThreeColorData = pcaThreeColor.fit_transform(threeColorData)
+myDatasetThreeColors = (pcaThreeColorData, targets)
+
+
+blackgray = np.asarray(extractColorPercentage("../data/set_train", 350, 650))
+pca1 = PCA(n_components=2)
+pca1Data = pca1.fit_transform(blackgray)
+myDatasetBlackGray = (pca1Data, targets)
+
+blackgray2 = np.asarray(extractColorPercentage("../data/set_train", 450, 1100))
+pca2 = PCA(n_components=2)
+pca2Data = pca2.fit_transform(blackgray2)
+myDatasetBlackGray2 = (pca2Data, targets)
+
+blackgray3 = np.asarray(extractColorPercentage("../data/set_train", 650, 900))
+pca3 = PCA(n_components=2)
+pca3Data = pca3.fit_transform(blackgray3)
+myDatasetBlackGray3 = (pca3Data, targets)
+
+graywhite = np.asarray(extractColorPercentage("../data/set_train", 450, 1100, 1, 2))
+pca2 = PCA(n_components=2)
+pca2Data = pca2.fit_transform(graywhite)
+myDatasetGrayWhite = (pca2Data, targets)
+
+blackwhite = np.asarray(extractColorPercentage("../data/set_train", 450, 1100, 0, 2))
+pca3 = PCA(n_components=2)
+pca3Data = pca3.fit_transform(blackwhite)
+myDatasetBlackWhite = (pca3Data, targets)
 '''
 
+# Get the targets
+with open('../data/targets.csv', 'rb') as f:
+    reader = csv.reader(f)
+    targets = list(reader)
+targets = np.asarray([int(x[0]) for x in targets])  
 
-datasets = [myDatasetHisto, myDatasetZone, myDatasetBlack]
+h = .02  # step size in the mesh
+
+names = ["Logistic Regression", "Linear SVM", "SGD Classifier", "Gaussian Process",
+         "Poly SVM", "Random Forest", "Neural Net", "AdaBoost",
+         "Naive Bayes", "QDA"]
+
+# What algorithms are we most interested in?
+# 
+# Some form of
+#
+#       SVC
+#       Gaussian Process Classifier
+#       Maybe AdaBoost?
+
+# These are the algorithms that have been discussed in class and these are the algorithms
+
+classifiers = [
+    #LogisticRegression(tol=0.0001, C=1.0, class_weight={0: 10}),
+    SVC(kernel="linear", C=0.025, probability=True, class_weight={0: 10}),
+    #SGDClassifier(loss="log", alpha=0.0001, shuffle=True, class_weight={0: 10}),
+    GaussianProcessClassifier(0.323 * RBF(0.4), warm_start=True),
+    SVC(kernel="poly", C=1.0, probability=True), 
+    SVC(kernel="sigmoid", C=1.0, probability=True), 
+    #RandomForestClassifier(max_depth=5, n_estimators=10, max_features=1),
+    #MLPClassifier(alpha=1),
+    #AdaBoostClassifier(base_estimator=SVC(kernel="linear", C=0.025, probability=True)),
+    #GaussianNB(),
+    #QuadraticDiscriminantAnalysis(),
+    #LinearDiscriminantAnalysis()]
+    ]
+'''
+blackgray = np.asarray(extractColorPercentage("../data/set_train", 350, 650))
+pca1 = PCA(n_components=2)
+pca1Data = pca1.fit_transform(blackgray)
+myDatasetBlackGray = (pca1Data, targets)
+
+grayData = np.asarray(extractColoredZone("../data/set_train", 450, 800, 8))
+pcaGray = PCA(n_components=2)
+pcaGrayData = pcaGray.fit_transform(grayData)
+myDatasetGray = (pcaGrayData, targets)
+
+histoData = np.asarray(extractHistograms("../data/set_train", 1500, 45, 16))
+pcaHisto = PCA(n_components=2)
+pcaHistoData = pcaHisto.fit_transform(histoData)
+myDatasetHisto = (pcaHistoData, targets)
+
+zoneData = np.asarray(extractZoneAverages("../data/set_train", 8))
+pcaZone = PCA(n_components=2)
+pcaZoneData = pcaZone.fit_transform(zoneData)
+myDatasetZone = (pcaZoneData, targets)
+'''
+grayData = np.asarray(extractColoredZone("../data/set_train", 450, 800, 8))
+pcaGray = PCA(n_components=2)
+pcaGrayData = pcaGray.fit_transform(grayData)
+myDatasetGray = (pcaGrayData, targets)
+
+histoData = np.asarray(extractHistograms("../data/set_train", 1500, 45, 16))
+pcaHisto = PCA(n_components=2)
+pcaHistoData = pcaHisto.fit_transform(histoData)
+myDatasetHisto = (pcaHistoData, targets)
+datasets = [myDatasetGray, myDatasetHisto]
+
+
+
 
 figure = plt.figure(figsize=(27, 9))
 i = 1
@@ -188,8 +267,8 @@ for ds_cnt, ds in enumerate(datasets):
     # iterate over classifiers
     for name, clf in zip(names, classifiers):
         ax = plt.subplot(len(datasets), len(classifiers) + 1, i)
-        clf.fit(X, y)
         score = cross_val_score(clf, X, y, cv=10, scoring='neg_log_loss', n_jobs=-1)#clf.score(X_test, y_test)
+        clf.fit(X, y)
 
         # Plot the decision boundary. For that, we will assign a color to each
         # point in the mesh [x_min, x_max]x[y_min, y_max].

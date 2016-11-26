@@ -1,5 +1,6 @@
 import nibabel as nib
 import sys
+import copy
 
 imgNumber = str(sys.argv[1])
 image = nib.load('../data/set_train/train_'+imgNumber+'.nii')
@@ -19,7 +20,27 @@ def show_slices(slices):
 slice_0 = epi_img_data[imgHalfX, :, :, 0]
 slice_1 = epi_img_data[:, imgHalfY, :, 0]
 slice_2 = epi_img_data[:, :, imgHalfZ, 0]
-show_slices([slice_0, slice_1, slice_2])
+modifiedSlice = copy.deepcopy(slice_2)
+
+darkColor = 350
+upperDark = 460
+grayColor = 750
+upperGray = 1100
+whiteColor = 2000
+
+for i in range(0, epi_img_data.shape[0]):
+	for j in range(0, epi_img_data.shape[1]):
+		value = modifiedSlice[i][j]
+		if value > 0:
+			if value <= upperDark:
+				modifiedSlice[i][j] = darkColor
+			if value <= upperGray and value > upperDark:
+				modifiedSlice[i][j] = grayColor
+			if value > upperGray:
+				modifiedSlice[i][j] = whiteColor
+
+
+show_slices([slice_2, modifiedSlice])
 plt.suptitle("Center slices for EPI image")  
 plt.show()
 
