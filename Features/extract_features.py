@@ -615,7 +615,7 @@ def extractColoredZone(imgDir, minColor, maxColor, nPartitions=1):
 	allColoredZones = []
 
 	# This is the cache for the feature, used to make sure we do the heavy computations more often than neccesary
-	outputFileName = os.path.join(featuresDir,"coloredzones_"+str(nPartitions)+"_"+str(minColor)+"_"+str(maxColor)+"_"+imgDir.replace(os.sep,"-")+".feature")
+	outputFileName = os.path.join(featuresDir,"coloredzones2d_"+str(nPartitions)+"_"+str(minColor)+"_"+str(maxColor)+"_"+imgDir.replace(os.sep,"-")+".feature")
 	if os.path.isfile(outputFileName):
 		save = open(outputFileName,'rb')
 		zoneAverages = pickle.load(save)
