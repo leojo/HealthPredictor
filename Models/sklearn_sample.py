@@ -297,7 +297,7 @@ pcaGray = PCA(n_components=2)
 pcaGrayData = pcaGray.fit_transform(grayData)
 myDatasetGray = (pcaGrayData, targets)
 
-gray3DData = np.asarray(extractColoredZone3D("../data/set_train", 450, 800, 8))
+grayData3D = np.asarray(extractColoredZone3D("../data/set_train", 450, 800, 8))
 pcaGray3D = PCA(n_components=2)
 pcaGrayData3D = pcaGray.fit_transform(grayData3D)
 myDatasetGray3D = (pcaGrayData3D, targets)

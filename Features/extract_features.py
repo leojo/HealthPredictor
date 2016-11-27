@@ -11,7 +11,7 @@ from printProgress import printProgress
 
 from sklearn.feature_extraction.image import grid_to_graph
 from sklearn.cluster import AgglomerativeClustering
-from skimage.measure import compare_ssim as ssim
+# from skimage.measure import compare_ssim as ssim
 
 # The directory to store the precomputed features
 featuresDir =  os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
@@ -191,7 +191,7 @@ def extractBrainPart(imgDir,n_divisions=3,x_part=0,y_part=0,z_part=0):
 	output.close()
 	print "Done"
 	return data
-
+'''
 # This was an attempt at a more sophisticated feature using agglomerative clustering to define "colors"
 # and then taking a histogram of those color. This did not prove to give better results.
 def extractHierarchicalClusters(imgDirFullPath, n_clusters=10, ignoreCache=False, scale=0.10):
@@ -295,8 +295,7 @@ def extractHierarchicalClustersSingleSlice(imgDirFullPath, n_clusters=10, ignore
 	output.close()
 	print "Done"
 	return clusters
-
-
+'''
 # imgDir must be a string and maxValue must be an integer
 # nBins is the number of "bins" for the histogram
 def extractZoneAverages(imgDir, nPartitions = 1):
@@ -422,7 +421,6 @@ def extractBlackzones(imgDir, nPartitions=1):
 	print "Done"
 	return allBlackZones
 
-<<<<<<< HEAD
 def extractThreeColors(imgDir, darkColor, grayColor, whiteColor, nPartitions=1):
 	imgPath = os.path.join(imgDir,"*")
 
@@ -610,9 +608,6 @@ def extractColorPercentage(imgDir, upperDark, upperGray):
 	print "Done"
 	return allPercentages
 
-=======
->>>>>>> 2f29850d321756c0d3cb3f82f4bfef7b922fa2a6
-
 # Written for 2D for faster computing while testing
 def extractColoredZone(imgDir, minColor, maxColor, nPartitions=1):
 	imgPath = os.path.join(imgDir,"*")
@@ -663,7 +658,6 @@ def extractColoredZone(imgDir, minColor, maxColor, nPartitions=1):
 	print "Done"
 	return allColoredZones
 
-<<<<<<< HEAD
 
 # Written for 3D
 def extractColoredZone3D(imgDir, minColor, maxColor, nPartitions=1):
@@ -716,8 +710,6 @@ def extractColoredZone3D(imgDir, minColor, maxColor, nPartitions=1):
 	return allColoredZones
 
 
-=======
->>>>>>> 2f29850d321756c0d3cb3f82f4bfef7b922fa2a6
 def extractImgNumber(imgPath):
 	imgName = imgPath.split(os.sep)[-1]
 	imgNum = int(imgName.split('_')[-1][:-4])
